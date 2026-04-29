@@ -15,22 +15,22 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '11'
     
-    - name: Create Web App
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Create Web App Files
       run: |
-        # ساخت پوشه و فایل HTML
-        mkdir -p www
-        cat > www/index.html << 'EOF'
+        mkdir -p app/src/main/assets
+        cat > app/src/main/assets/index.html << 'EOF'
         <!DOCTYPE html>
-        <html lang="fa">
+        <html>
         <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>یافت یار</title>
+            <title>Yaft Yar</title>
             <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html { width: 100%; height: 100%; overflow: hidden; }
+                body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
                 iframe { width: 100%; height: 100%; border: none; }
             </style>
         </head>
@@ -40,31 +40,24 @@ jobs:
         </html>
         EOF
         
-        # ساخت فایل پیکربندی
-        cat > package.json << 'EOF'
-        {
-          "name": "yaft-yar",
-          "version": "1.0.0",
-          "scripts": {
-            "build": "echo 'Build complete'"
-          }
-        }
+        cat > app/AndroidManifest.xml << 'EOF'
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="com.yaftyar.app">
+            <application android:usesCleartextTraffic="true">
+                <activity android:name="androidx.appcompat.app.AppCompatActivity"
+                    android:theme="@style/Theme.AppCompat.NoActionBar">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                </activity>
+            </application>
+            <uses-permission android:name="android.permission.INTERNET" />
+        </manifest>
         EOF
     
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-    
-    - name: Install and Build with PWABuilder
-      run: |
-        npm install -g @pwabuilder/pwabuild
-        pwabuild package https://yaft-yar.ir --platform android
-    
-    - name: Upload APK
+    - name: Upload HTML Files
       uses: actions/upload-artifact@v4
       with:
-        name: YaftYar-App
-        path: |
-          **/*.apk
-          **/*.aab
+        name: yaftyar-webapp
+        path: app/
