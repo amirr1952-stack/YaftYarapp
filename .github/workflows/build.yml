@@ -1,63 +1,29 @@
 name: Build APK
 
-on:
+on: 
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-    
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-    
-    - name: Create Web App Files
+    - uses: actions/checkout@v4
+
+    - name: Make HTML
       run: |
-        mkdir -p app/src/main/assets
-        cat > app/src/main/assets/index.html << 'EOF'
-        <!DOCTYPE html>
+        echo '<!DOCTYPE html>
         <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Yaft Yar</title>
-            <style>
-                body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
-                iframe { width: 100%; height: 100%; border: none; }
-            </style>
+        <head><meta charset="UTF-8"><title>Yaft Yar</title>
+        <style>body{margin:0;} iframe{width:100%;height:100vh;border:none;}</style>
         </head>
         <body>
-            <iframe src="https://yaft-yar.ir"></iframe>
+        <iframe src="https://yaft-yar.ir"></iframe>
         </body>
-        </html>
-        EOF
-        
-        cat > app/AndroidManifest.xml << 'EOF'
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-            package="com.yaftyar.app">
-            <application android:usesCleartextTraffic="true">
-                <activity android:name="androidx.appcompat.app.AppCompatActivity"
-                    android:theme="@style/Theme.AppCompat.NoActionBar">
-                    <intent-filter>
-                        <action android:name="android.intent.action.MAIN" />
-                        <category android:name="android.intent.category.LAUNCHER" />
-                    </intent-filter>
-                </activity>
-            </application>
-            <uses-permission android:name="android.permission.INTERNET" />
-        </manifest>
-        EOF
-    
-    - name: Upload HTML Files
+        </html>' > index.html
+
+    - name: Upload HTML
       uses: actions/upload-artifact@v4
       with:
-        name: yaftyar-webapp
-        path: app/
+        name: yaftyar-html
+        path: index.html
